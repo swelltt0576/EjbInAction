@@ -1,0 +1,5 @@
+- Run the ant script under the chapter3 directory.
+- If the JBoss application server is running, make sure the new application is deployed.
+- If the application server is not running, start it.
+- To run the Stateless Session Bean client, execute the run-slsb ant target.
+- To run the Stateful Session Bean client, execute the run-sfsb ant target.

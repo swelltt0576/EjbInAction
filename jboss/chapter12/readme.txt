@@ -1,0 +1,6 @@
+- Run the ant script under the chapter12 directory.
+- If the JBoss application server is running, make sure the new application is deployed.
+- If the application server is not running, start it.
+- To run the web client, go to http://localhost:8080/chapter12/.
+- To run the EJB client, execute the run-bid ant target.
+- To run the Java SE client, execute the run-bid-main ant target. Make sure the application server is shut down before running the Java SE client.

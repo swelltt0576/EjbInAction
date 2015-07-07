@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="configure-jboss" default="all" basedir=".">
+	<import file="common.xml" />
+
+	<target name="init">
+		<echo message="-----> Initializing project properties" />
+	</target>
+
+	<target name="all" depends="init, CreateJMSResource" />
+
+	<!-- Create JMS destinations for JBoss MQ -->
+	<target name="CreateJMSResource">
+		<copy file="ejb3inaction-destinations-service.xml" todir="${JBOSS_HOME}/server/default/deploy" />
+	</target>
+</project>

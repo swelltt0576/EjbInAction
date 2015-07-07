@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server>
+	<mbean code="org.jboss.mq.server.jmx.Queue"
+		name="jboss.mq.destination:service=Queue,name=OrderBillingQueue">
+		<attribute name="JNDIName">jms/OrderBillingQueue</attribute>
+		<use-java-context>false</use-java-context>
+		<depends optional-attribute-name="DestinationManager">
+			jboss.mq:service=DestinationManager
+		</depends>
+	</mbean>
+	<mbean code="org.jboss.mq.server.jmx.Queue"
+		name="jboss.mq.destination:service=Queue,name=ShippingRequestQueue">
+		<attribute name="JNDIName">jms/ShippingRequestQueue</attribute>
+		<use-java-context>false</use-java-context>
+		<depends optional-attribute-name="DestinationManager">
+			jboss.mq:service=DestinationManager
+		</depends>
+	</mbean>
+</server>

@@ -1,0 +1,5 @@
+- Run the ant script under the chapter11 directory.
+- If the JBoss application server is running, make sure the new application is deployed.
+- If the application server is not running, start it.
+- To run the bid client, execute the run-bid ant target.
+- To run the admin client, execute the run-admin ant target.

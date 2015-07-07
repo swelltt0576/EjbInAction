@@ -1,0 +1,4 @@
+- Run the ant script under the chapter10 directory.
+- If the JBoss application server is running, make sure the new application is deployed.
+- If the application server is not running, start it.
+- To run the client, execute the run ant target.

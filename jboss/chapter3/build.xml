@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="chapter3" default="all" basedir=".">
+	<import file="../common.xml" />
+
+	<!-- ****************************************************************
+	     ** Creates deployable units for the          		           **
+	     ** application.                                               **
+	     **************************************************************** -->
+	<target name="all" depends="package,deploy" description="Creates and deploys all deployable units for the application">
+		<echo message="-----> Creates and deploys all deployable units for the application" />
+	</target>
+
+	<target name="java-env-check" unless="env.JAVA_HOME">
+		<fail message="JAVA_HOME environment variables must be set." />
+	</target>
+
+	<!-- ******************************************************
+	     ** Initialize all properties relevant to the        **
+	     ** execution of this how-to demonstration.          **
+	     ****************************************************** -->
+	<target name="init" depends="common,java-env-check">
+		<echo message="-----> Initializing project properties" />
+
+		<property name="app.name" value="chapter3" />
+		<property name="ear.name" value="${app.name}" />
+		<property name="ejb.jar.name" value="${ear.name}-ejb" />
+		<property name="sfsb.client.jar.name" value="${ear.name}-sfsb-client" />
+		<property name="slsb.client.jar.name" value="${ear.name}-slsb-client" />
+
+		<property name="src.dir" value="./src" />
+		<property name="bld.dir" value="./build" />
+		<property name="etc.dir" value="./etc" />
+
+		<property name="src.ejb.dir" value="${src.dir}/ejb" />
+		<property name="src.sfsb.client.dir" value="${src.dir}/client/sfsb" />
+		<property name="src.slsb.client.dir" value="${src.dir}/client/slsb" />
+
+		<property name="bld.ejb.jar.dir" value="${bld.dir}/${ejb.jar.name}" />
+		<property name="bld.sfsb.client.jar.dir" value="${bld.dir}/${sfsb.client.jar.name}" />
+		<property name="bld.slsb.client.jar.dir" value="${bld.dir}/${slsb.client.jar.name}" />
+		<property name="bld.ear.dir" value="${bld.dir}/${ear.name}" />
+
+		<property name="bld.compiler" value="classic" />
+		<property name="class.files" value="**/*.class" />
+	</target>
+
+	<!-- ***********************************************
+	     ** Removes the build process artifacts       **
+	     *********************************************** -->
+	<target name="clean" depends="init" description="Removes the contents of the build directory">
+		<echo message="-----> Removing the contents of the ${bld.dir} directory" />
+		<delete dir="${bld.dir}" />
+	</target>
+
+	<!-- ****************************************************************
+	     ** Sets up required directories and configuration for how-to  **
+	     **************************************************************** -->
+	<target name="setup" depends="init">
+		<echo message="-----> Creating the required sub-directories" />
+		<mkdir dir="${bld.dir}" />
+		<mkdir dir="${bld.ear.dir}" />
+		<mkdir dir="${bld.ear.dir}/META-INF" />
+		<mkdir dir="${bld.ejb.jar.dir}/META-INF" />
+		<mkdir dir="${bld.sfsb.client.jar.dir}/META-INF" />
+		<mkdir dir="${bld.slsb.client.jar.dir}/META-INF" />
+	</target>
+
+	<!-- ****************************************************************
+	     ** Package the EAR File                                       **
+	     ****************************************************************  -->
+	<target name="build" depends="package" description="Package the application in an ear file">
+		<echo message="Location of the ear file: ${bld.dir}/${ear.name}.ear" />
+	</target>
+
+	<target name="package" depends="package-ejb,package-sfsb-client,package-slsb-client">
+		<echo message="-----> Creating EAR file" />
+		<copy todir="${bld.ear.dir}/META-INF">
+			<fileset dir="${etc.dir}" includes="application.xml" />
+			<fileset dir="${etc.dir}" includes="jboss-app.xml" />
+		</copy>
+		<jar destfile="${bld.dir}/${ear.name}.ear">
+			<fileset dir="${bld.ear.dir}" includes="**" />
+		</jar>
+	</target>
+
+	<!-- ******************************************************************
+	     ** Compile the EJB Classes	                                     **
+	     ****************************************************************** -->
+	<target name="compile-ejb-classes" depends="setup">
+		<echo message="-----> Compiling EJBs" />
+		<javac srcdir="${src.ejb.dir}" destdir="${bld.ejb.jar.dir}" debug="on">
+			<classpath>
+				<pathelement path="${common.j2ee.class.path}" />
+				<pathelement location="${bld.ejb.jar.dir}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- ******************************************************************
+	     ** Add EJB Descriptors                                          **
+	     ******************************************************************* -->
+	<target name="ejb-descriptor" depends="setup">
+		<echo message="-----> Adding deployment descriptors" />
+		<copy todir="${bld.ejb.jar.dir}/META-INF">
+			<fileset dir="${etc.dir}" includes="ejb-jar.xml, persistence.xml" />
+		</copy>
+	</target>
+
+	<!-- ****************************************************************
+	     ** Create EJB jar file									       **
+	     **************************************************************** -->
+	<target name="package-ejb" depends="compile-ejb-classes,ejb-descriptor">
+		<echo message="-----> Creating EJB jar file" />
+		<jar jarfile="${bld.ear.dir}/${ejb.jar.name}.jar">
+			<fileset dir="${bld.ejb.jar.dir}" includes="**" />
+		</jar>
+	</target>
+
+	<!-- ****************************************************************
+	     ** Create Client jar file									   **
+	     **************************************************************** -->
+	<target name="package-sfsb-client" depends="compile-sfsb-client-classes,sfsb-client-descriptor">
+		<echo message="-----> Creating SFSB client jar" />
+		<jar jarfile="${bld.dir}/${sfsb.client.jar.name}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="com.ejb3inaction.actionbazaar.client.AccountCreatorClient" />
+				<attribute name="Class-Path" value="${ear.name}/${ejb.jar.name}.jar" />
+			</manifest>
+			<fileset dir="${bld.sfsb.client.jar.dir}" includes="**" />
+		</jar>
+	</target>
+	<target name="package-slsb-client" depends="compile-slsb-client-classes,slsb-client-descriptor">
+		<echo message="-----> Creating SLSB client jar" />
+		<jar jarfile="${bld.dir}/${slsb.client.jar.name}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="com.ejb3inaction.actionbazaar.client.PlaceBidClient" />
+				<attribute name="Class-Path" value="${ear.name}/${ejb.jar.name}.jar" />
+			</manifest>
+			<fileset dir="${bld.slsb.client.jar.dir}" includes="**" />
+		</jar>
+	</target>
+
+	<target name="compile-sfsb-client-classes" depends="setup">
+		<javac srcdir="${src.sfsb.client.dir}" destdir="${bld.sfsb.client.jar.dir}" debug="on">
+			<classpath>
+				<pathelement path="${common.client.class.path}" />
+				<pathelement location="${bld.sfsb.client.jar.dir}" />
+				<pathelement location="${bld.ejb.jar.dir}" />
+			</classpath>
+		</javac>
+	</target>
+	<target name="compile-slsb-client-classes" depends="setup">
+		<javac srcdir="${src.slsb.client.dir}" destdir="${bld.slsb.client.jar.dir}" debug="on">
+			<classpath>
+				<pathelement path="${common.client.class.path}" />
+				<pathelement location="${bld.slsb.client.jar.dir}" />
+				<pathelement location="${bld.ejb.jar.dir}" />
+				<pathelement location="${bld.dir}/${ejb.jar.name}.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="sfsb-client-descriptor" depends="setup">
+		<copy todir="${bld.sfsb.client.jar.dir}/META-INF">
+			<fileset dir="${etc.dir}" includes="application-client.xml" />
+		</copy>
+		<copy todir="${bld.sfsb.client.jar.dir}">
+			<fileset dir="${etc.dir}" includes="jndi.properties" />
+		</copy>
+	</target>
+	<target name="slsb-client-descriptor" depends="setup">
+		<copy todir="${bld.slsb.client.jar.dir}/META-INF">
+			<fileset dir="${etc.dir}" includes="application-client.xml" />
+		</copy>
+		<copy todir="${bld.slsb.client.jar.dir}">
+			<fileset dir="${etc.dir}" includes="jndi.properties" />
+		</copy>
+	</target>
+
+	<target name="CreateDatabase">
+		<sql driver="org.hsqldb.jdbcDriver" url="jdbc:hsqldb:file:${JBOSS_HOME}/server/default/data/hypersonic/localDB;shutdown=true" userid="sa" password="" print="yes" classpath="${JBOSS_HOME}/server/default/lib/hsqldb.jar" autocommit="true" src="sql/hypersonic.sql" />
+	</target>
+
+	<target name="undeploy" depends="init">
+		<echo message="Undeploying ${ear.name} example" level="verbose" />
+		<!-- Delete deployed EAR -->
+		<delete file="${JBOSS_HOME}/server/default/deploy/${ear.name}.ear" />
+	</target>
+
+	<target name="deploy" depends="init, CreateDatabase">
+		<echo message="Deploying ${ear.name} example" level="verbose">
+		</echo>
+		<copy file="${bld.dir}/${ear.name}.ear" todir="${JBOSS_HOME}/server/default/deploy" />
+	</target>
+
+	<target name="run-sfsb" depends="init">
+		<echo message="Executing client class using ${bld.dir}/${sfsb.client.jar.name}.jar" />
+		<java classname="com.ejb3inaction.actionbazaar.client.AccountCreatorClient" fork="true" maxmemory="128m">
+			<classpath>
+				<pathelement path="${common.client.class.path}" />
+				<pathelement location="${bld.dir}/${sfsb.client.jar.name}.jar" />
+				<pathelement location="${bld.dir}/${ejb.jar.name}.jar" />
+			</classpath>
+		</java>
+	</target>
+	<target name="run-slsb" depends="init">
+		<echo message="Executing client class using ${bld.dir}/${slsb.client.jar.name}.jar" />
+		<java classname="com.ejb3inaction.actionbazaar.client.PlaceBidClient" fork="true" maxmemory="128m">
+			<classpath>
+				<pathelement path="${common.client.class.path}" />
+				<pathelement location="${bld.dir}/${slsb.client.jar.name}.jar" />
+				<pathelement location="${bld.dir}/${ejb.jar.name}.jar" />
+			</classpath>
+		</java>
+	</target>
+</project>

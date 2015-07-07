@@ -1,0 +1,27 @@
+<?xml version = '1.0'?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	<description>ActionBazaar Web Application</description>
+	<servlet>
+		<servlet-name>PlaceBidServlet</servlet-name>
+		<servlet-class>
+			com.ejb3inaction.actionbazaar.web.PlaceBidServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PlaceBidServlet</servlet-name>
+		<url-pattern>/PlaceBidServlet</url-pattern>
+	</servlet-mapping>
+	<mime-mapping>
+		<extension>html</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>txt</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

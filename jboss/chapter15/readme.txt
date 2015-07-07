@@ -1,0 +1,5 @@
+- Run the ant script under the chapter15 directory.
+- If the JBoss application server is running, make sure the new application is deployed.
+- If the application server is not running, start it.
+- To build the web service client, execute the build-client ant target. 
+- To run the web service client, execute the run ant target.
